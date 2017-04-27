@@ -1,8 +1,10 @@
 let awaitingAsync = gen => {
   return new Promise((resolve, reject) => {
     function runner(thenable) {
+      console.log('in the runner', thenable)
       thenable
         .then(result => {
+          console.log('in the runner then');
           const { value, done } = it.next(result);
 
           if (done) {
@@ -41,7 +43,7 @@ let awaitingAsync = gen => {
     if (done) {
       return resolve();
     }
-
+    console.log(value, value.then)
     // Even if done, we still need to pass thenable result back into generator function
     runner(value);
   });
