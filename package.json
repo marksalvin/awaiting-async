@@ -17,9 +17,12 @@
   },
   "scripts": {
     "lint": "eslint config src/js/** --ext .js",
-    "test": "BABEL_ENV=test ava './test/**/*.spec.js' --tap"
+    "test": "BABEL_ENV=test ava './test/**/*.spec.js'",
+    "tape": "BABEL_ENV=test tape './test/**/*.spec.js'"
   },
   "dependencies": {
-    "ava": "0.19.1"
+    "ava": "0.19.1",
+    "proxyquire": "1.7.11",
+    "tape": "4.6.3"
   }
 }
