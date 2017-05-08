@@ -132,3 +132,5 @@ test('that when generator throws an unhandled error that error is thrown out of 
     });
 
 });
+
+// TODO: add code to catch thrown error in initial it next()

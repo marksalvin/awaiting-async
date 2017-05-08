@@ -1,32 +1,42 @@
-// TODO: need to return resolved or rejected value and write tests!
-// TODO: review error handling methods for uncaught thrown errors
+const isPromise = obj =>
+  !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
+
+/**
+ * A runner for stepping through generators containing yielded promises.
+ * This function should not be called if the iterator is already "done".
+ */
 const asyncRunner = (thenable, resolve, reject, it) => {
-  console.log('in the runner', thenable)
-  thenable
-    .then(result => {
-      console.log('in the runner then');
-      const { value, done } = it.next(result);
+  try {
+    if (!isPromise(thenable)) {
+      // Only promises can be yielded by function
+      return reject(`Only promises may be yielded, but "${thenable}" was yielded instead`);
+    }
 
-      return done ? resolve() : runner(value);
-    })
-    .catch(error => {
-      let value, done;
-      try {
-        // TODO: I think that if it's an uncaught error it won't run this line???
-        const itResponse = it.throw(new Error(error));
-        value = itResponse.value;
-        done = itResponse.done;
-      } catch (err) {
-        /**
-         * Unhandled error within the generator
-         * We only need to catch when passing in an error to the generator
-         * Errors thrown in the generator will be caught in here anyway
-         */
-        return reject(err);
-      }
+    thenable
+      .then(result => {
+        const { value, done } = it.next(result);
+        return done ? resolve(value) : asyncRunner(value, resolve, reject, it);
+      })
+      .catch(error => {
+        let value, done;
 
-      return done ? resolve() : runner(value);
-    });
+        try {
+          const itResponse = it.throw(new Error(error));
+          value = itResponse.value;
+          done = itResponse.done;
+        } catch (error) {
+          /*
+           * When error passed into generator is not caught, it will be caught here. Else caught in
+           * outer try catch
+           */
+          return reject(error);
+        }
+
+        return done ? resolve(value) : asyncRunner(value, resolve, reject, it);
+      });
+  } catch (error) {
+    return reject(error);
+  }
 };
 
 module.exports = asyncRunner;
