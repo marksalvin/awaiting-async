@@ -5,7 +5,7 @@ test('that function returns a promise', t => {
 
   t.plan(1);
 
-  const target = proxyquire('../src/awaiting-async', {});
+  const target = proxyquire('../src/main', {});
 
   const fakeGenerator = function *() {};
   
@@ -21,8 +21,8 @@ test('that when generator has no yields it resolves with return value from gener
   
   t.plan(1);
 
-  const target = proxyquire('../src/awaiting-async', {
-    './async-runner': () => t.fail('Async runner should not be called'),
+  const target = proxyquire('../src/main', {
+    './runner': () => t.fail('Async runner should not be called'),
   });
 
   const fakeGenerator = function *() {
@@ -44,9 +44,9 @@ test('that when generator has a resolved yield it calls async runner with a reso
 
   t.plan(2);
 
-  const target = proxyquire('../src/awaiting-async', {
-    './async-runner': (value, resolve, reject, it) => {
-      value
+  const target = proxyquire('../src/main', {
+    './runner': (thenable, resolve, reject, it) => {
+      thenable
         .then(result => {
           t.equal(result, 'fake resolution reason');
           return resolve('fake fulfilled value');
@@ -54,10 +54,8 @@ test('that when generator has a resolved yield it calls async runner with a reso
     },
   });
 
-  const fakePromise = () => new Promise((resolve, reject) => resolve('fake resolution reason'));
-
   const fakeGenerator = function *() {
-    const value = yield fakePromise();
+    const value = yield Promise.resolve('fake resolution reason');
   };
 
   target(fakeGenerator)
@@ -76,8 +74,8 @@ test('that when generator has a rejected yield it calls async runner with a reje
  
   t.plan(2);
 
-  const target = proxyquire('../src/awaiting-async', {
-    './async-runner': (value, resolve, reject, it) => {
+  const target = proxyquire('../src/main', {
+    './runner': (value, resolve, reject, it) => {
       value
         .catch(error => {
           t.equals(error, 'fake rejection reason');
@@ -86,10 +84,8 @@ test('that when generator has a rejected yield it calls async runner with a reje
     },
   });
 
-  const fakePromise = () => new Promise((resolve, reject) => reject('fake rejection reason'));
-
   const fakeGenerator = function *() {
-    const value = yield fakePromise();
+    const value = yield Promise.reject('fake rejection reason');
   };
 
   target(fakeGenerator)
@@ -104,12 +100,12 @@ test('that when generator has a rejected yield it calls async runner with a reje
 
 });
 
-test('that when generator throws an unhandled error that error is thrown out of function', t => {
+test('that when generator throws an unhandled error that error is thrown out of function into catch block due to promise nature', t => {
 
   t.plan(1);
 
-  const target = proxyquire('../src/awaiting-async', {
-    './async-runner': (value, resolve, reject, it) => {
+  const target = proxyquire('../src/main', {
+    './runner': (value, resolve, reject, it) => {
       t.fail('This should not be called');
     },
   });
@@ -132,5 +128,3 @@ test('that when generator throws an unhandled error that error is thrown out of 
     });
 
 });
-
-// TODO: add code to catch thrown error in initial it next()

@@ -1,10 +1,11 @@
 const test = require('tape');
+const proxyquire = require('proxyquire').noCallThru();
 
 test('that thenable is resolved and value is passed back into generator', t => {
 
   t.plan(2);
 
-  const target = require('../src/async-runner');
+  const target = require('../src/runner');
   
   const fakeResolve = () => {
     t.pass('promise resolve called');
@@ -30,7 +31,7 @@ test('that returned value from generator is passed into resolve', t => {
 
   t.plan(1);
 
-  const target = require('../src/async-runner');
+  const target = require('../src/runner');
   
   const fakeResolve = value => {
     t.equals(value, 'fake generator return value', 'generator return value passed to promise resolution');
@@ -54,32 +55,35 @@ test('that returned value from generator is passed into resolve', t => {
 
 });
 
-test('that multiple promises can be resolved', t => {
+test('that when there is a second promise to yield the runner calls itself recursively with the correct arguments', t => {
 
-  t.plan(4);
+  t.plan(6);
 
-  const target = require('../src/async-runner');
-  
-  const fakeResolve = value => {
-    t.pass('promise resolved after multiple yielded promises');
-  };
+  const fakeResolve = 'fake resolve';
 
-  const fakeReject = () => {
-    t.fail('this should not be called');
-  };
+  const fakeReject = 'fake reject';
 
   const fakeGenerator = function *() {
     const firstResult = yield Promise.resolve('first resolution value');
     t.equals(firstResult, 'first resolution value', 'first promise is resolved');
-    const secondResult = yield Promise.resolve('second resolution value');
-    t.equals(secondResult, 'second resolution value', 'second promise is resolved');
-    const thirdResult = yield Promise.resolve('third resolution value');
-    t.equals(thirdResult, 'third resolution value', 'third promise is resolved');
+    yield Promise.resolve('second resolution value');
+    yield Promise.resolve('third resolution value');
   };
 
   const it = fakeGenerator();
   const next = it.next();
   const fakeThenable = next.value;
+
+  const target = proxyquire('../src/runner', {
+    './proxy-function-call': (proxiedFunction, functionArguments) => {
+      t.deepEquals(proxiedFunction, target, 'runner is passed in as the function to proxy');
+      t.deepEquals(functionArguments[0], Promise.resolve('second resolution value'), 'the second promise to yield is passed as the "thenable"');
+      t.deepEquals(functionArguments[1], 'fake resolve', 'the resolve is passed in');
+      t.deepEquals(functionArguments[2], 'fake reject', 'the reject is passed in');
+      t.deepEquals(functionArguments[3].next(), { value: Promise.resolve('third resolution value'), done: false }, 'the iterator is passed in and calling next returns the third promise to yield as expected');
+      // NB: don't proxy the function call and finish the test here
+    },
+  });
 
   target(fakeThenable, fakeResolve, fakeReject, it);
 
@@ -89,7 +93,7 @@ test('that an attempt to yield a non promises will reject the promise', t => {
 
   t.plan(1);
 
-  const target = require('../src/async-runner');
+  const target = require('../src/runner');
   
   const fakeResolve = () => {
     t.fail('this should not be called');
@@ -116,7 +120,7 @@ test('that when thenable is rejected an error is thrown, which can be caught wit
 
   t.plan(2);
 
-  const target = require('../src/async-runner');
+  const target = require('../src/runner');
   
   const fakeResolve = value => {
     t.equals(value, 'fake generator return value', 'generator return value passed to promise resolution');
@@ -148,7 +152,7 @@ test('that when thenable is rejected an error is thrown, which when uncaught by 
 
   t.plan(1);
 
-  const target = require('../src/async-runner');
+  const target = require('../src/runner');
   
   const fakeResolve = value => {
     t.fail('this should not be called');
@@ -174,7 +178,7 @@ test('that when initial iterator next() throws an uncaught error, it should be c
 
   t.plan(2);
 
-  const target = require('../src/async-runner');
+  const target = require('../src/runner');
   
   const fakeResolve = value => {
     t.fail('this should not be called');
@@ -191,8 +195,7 @@ test('that when initial iterator next() throws an uncaught error, it should be c
 
   const it = fakeGenerator();
   
-  // NB: This is how external code should consume the function
-  // TODO: implement this error handling in calling code with associated test
+  // NB: This is how external code should consume the function (or wrapped within a promise)
   try {
     const fakeThenable = it.next().value;
     target(fakeThenable, fakeResolve, fakeReject, it);
@@ -207,7 +210,7 @@ test('that assuming initial iterator next() does not throw an uncaught error, wh
 
   t.plan(1);
 
-  const target = require('../src/async-runner');
+  const target = require('../src/runner');
   
   const fakeResolve = value => {
     t.fail('this should not be called');
@@ -226,6 +229,37 @@ test('that assuming initial iterator next() does not throw an uncaught error, wh
 
   const it = fakeGenerator();
   const fakeThenable = it.next().value;
+
+  target(fakeThenable, fakeResolve, fakeReject, it);
+
+});
+
+test('demonstrate multiple promises being resolved', t => {
+
+  t.plan(4);
+
+  const target = require('../src/runner');
+  
+  const fakeResolve = value => {
+    t.pass('promise resolved after multiple yielded promises');
+  };
+
+  const fakeReject = () => {
+    t.fail('this should not be called');
+  };
+
+  const fakeGenerator = function *() {
+    const firstResult = yield Promise.resolve('first resolution value');
+    t.equals(firstResult, 'first resolution value', 'first promise is resolved');
+    const secondResult = yield Promise.resolve('second resolution value');
+    t.equals(secondResult, 'second resolution value', 'second promise is resolved');
+    const thirdResult = yield Promise.resolve('third resolution value');
+    t.equals(thirdResult, 'third resolution value', 'third promise is resolved');
+  };
+
+  const it = fakeGenerator();
+  const next = it.next();
+  const fakeThenable = next.value;
 
   target(fakeThenable, fakeResolve, fakeReject, it);
 

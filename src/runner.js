@@ -1,11 +1,11 @@
-const isPromise = obj =>
-  !!obj && (typeof obj === 'object' || typeof obj === 'function') && typeof obj.then === 'function';
+const isPromise = require('./is-promise');
+const proxyFunctionCall = require('./proxy-function-call');
 
 /**
  * A runner for stepping through generators containing yielded promises.
  * This function should not be called if the iterator is already "done".
  */
-const asyncRunner = (thenable, resolve, reject, it) => {
+const runner = (thenable, resolve, reject, it) => {
   try {
     if (!isPromise(thenable)) {
       // Only promises can be yielded by function
@@ -15,7 +15,7 @@ const asyncRunner = (thenable, resolve, reject, it) => {
     thenable
       .then(result => {
         const { value, done } = it.next(result);
-        return done ? resolve(value) : asyncRunner(value, resolve, reject, it);
+        return done ? resolve(value) : proxyFunctionCall(runner, [value, resolve, reject, it]);
       })
       .catch(error => {
         let value, done;
@@ -32,11 +32,11 @@ const asyncRunner = (thenable, resolve, reject, it) => {
           return reject(error);
         }
 
-        return done ? resolve(value) : asyncRunner(value, resolve, reject, it);
+        return done ? resolve(value) : proxyFunctionCall(runner, [value, resolve, reject, it]);
       });
   } catch (error) {
     return reject(error);
   }
 };
 
-module.exports = asyncRunner;
+module.exports = runner;
