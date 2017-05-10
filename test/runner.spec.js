@@ -5,7 +5,7 @@ test('that thenable is resolved and value is passed back into generator', t => {
 
   t.plan(2);
 
-  const target = require('../src/runner');
+  const target = require('../lib/runner');
   
   const fakeResolve = () => {
     t.pass('promise resolve called');
@@ -31,7 +31,7 @@ test('that returned value from generator is passed into resolve', t => {
 
   t.plan(1);
 
-  const target = require('../src/runner');
+  const target = require('../lib/runner');
   
   const fakeResolve = value => {
     t.equals(value, 'fake generator return value', 'generator return value passed to promise resolution');
@@ -74,7 +74,7 @@ test('that when there is a second promise to yield the runner calls itself recur
   const next = it.next();
   const fakeThenable = next.value;
 
-  const target = proxyquire('../src/runner', {
+  const target = proxyquire('../lib/runner', {
     './proxy-function-call': (proxiedFunction, functionArguments) => {
       t.deepEquals(proxiedFunction, target, 'runner is passed in as the function to proxy');
       t.deepEquals(functionArguments[0], Promise.resolve('second resolution value'), 'the second promise to yield is passed as the "thenable"');
@@ -93,7 +93,7 @@ test('that an attempt to yield a non promises will reject the promise', t => {
 
   t.plan(1);
 
-  const target = require('../src/runner');
+  const target = require('../lib/runner');
   
   const fakeResolve = () => {
     t.fail('this should not be called');
@@ -120,7 +120,7 @@ test('that when thenable is rejected an error is thrown, which can be caught wit
 
   t.plan(2);
 
-  const target = require('../src/runner');
+  const target = require('../lib/runner');
   
   const fakeResolve = value => {
     t.equals(value, 'fake generator return value', 'generator return value passed to promise resolution');
@@ -152,7 +152,7 @@ test('that when thenable is rejected an error is thrown, which when uncaught by 
 
   t.plan(1);
 
-  const target = require('../src/runner');
+  const target = require('../lib/runner');
   
   const fakeResolve = value => {
     t.fail('this should not be called');
@@ -178,7 +178,7 @@ test('that when initial iterator next() throws an uncaught error, it should be c
 
   t.plan(2);
 
-  const target = require('../src/runner');
+  const target = require('../lib/runner');
   
   const fakeResolve = value => {
     t.fail('this should not be called');
@@ -210,7 +210,7 @@ test('that assuming initial iterator next() does not throw an uncaught error, wh
 
   t.plan(1);
 
-  const target = require('../src/runner');
+  const target = require('../lib/runner');
   
   const fakeResolve = value => {
     t.fail('this should not be called');
@@ -238,7 +238,7 @@ test('demonstrate multiple promises being resolved', t => {
 
   t.plan(4);
 
-  const target = require('../src/runner');
+  const target = require('../lib/runner');
   
   const fakeResolve = value => {
     t.pass('promise resolved after multiple yielded promises');

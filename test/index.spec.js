@@ -5,7 +5,7 @@ test('that function returns a promise', t => {
 
   t.plan(1);
 
-  const target = proxyquire('../src/main', {});
+  const target = proxyquire('../lib/', {});
 
   const fakeGenerator = function *() {};
   
@@ -21,7 +21,7 @@ test('that when generator has no yields it resolves with return value from gener
   
   t.plan(1);
 
-  const target = proxyquire('../src/main', {
+  const target = proxyquire('../lib/', {
     './runner': () => t.fail('Async runner should not be called'),
   });
 
@@ -44,7 +44,7 @@ test('that when generator has a resolved yield it calls async runner with a reso
 
   t.plan(2);
 
-  const target = proxyquire('../src/main', {
+  const target = proxyquire('../lib/', {
     './runner': (thenable, resolve, reject, it) => {
       thenable
         .then(result => {
@@ -74,7 +74,7 @@ test('that when generator has a rejected yield it calls async runner with a reje
  
   t.plan(2);
 
-  const target = proxyquire('../src/main', {
+  const target = proxyquire('../lib/', {
     './runner': (value, resolve, reject, it) => {
       value
         .catch(error => {
@@ -104,7 +104,7 @@ test('that when generator throws an unhandled error that error is thrown out of 
 
   t.plan(1);
 
-  const target = proxyquire('../src/main', {
+  const target = proxyquire('../lib/', {
     './runner': (value, resolve, reject, it) => {
       t.fail('This should not be called');
     },
