@@ -1,4 +1,4 @@
-# Promisync · ![alt](https://travis-ci.org/marksalvin/promisync.svg?branch=master "Build")
+# Promisync · ![alt](https://travis-ci.org/marksalvin/promisync.svg?branch=master "Build") [![codecov](https://codecov.io/gh/marksalvin/promisync/branch/master/graph/badge.svg)](https://codecov.io/gh/marksalvin/promisync)
 
 ## About
 
