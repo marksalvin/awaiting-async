@@ -89,7 +89,7 @@ test('that when there is a second promise to yield the runner calls itself recur
 
 });
 
-test('that an attempt to yield a non promises will reject the promise', t => {
+test('that an attempt to yield a non promise will reject the promise', t => {
 
   t.plan(1);
 
@@ -104,7 +104,7 @@ test('that an attempt to yield a non promises will reject the promise', t => {
   };
 
   const fakeGenerator = function *() {
-    const result = yield 5;
+    yield 5;
     t.fail('this should not be called');
   };
 
@@ -154,7 +154,7 @@ test('that when thenable is rejected an error is thrown, which when uncaught by 
 
   const target = require('../lib/runner');
   
-  const fakeResolve = value => {
+  const fakeResolve = () => {
     t.fail('this should not be called');
   };
 
