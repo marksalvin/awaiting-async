@@ -1,8 +1,8 @@
-# Promisync · ![alt](https://travis-ci.org/marksalvin/promisync.svg?branch=master "Build") [![codecov](https://codecov.io/gh/marksalvin/promisync/branch/master/graph/badge.svg)](https://codecov.io/gh/marksalvin/promisync)
+# awaiting-async · ![alt](https://travis-ci.org/marksalvin/awaiting-async.svg?branch=master "Build") [![codecov](https://codecov.io/gh/marksalvin/awaiting-async/branch/master/graph/badge.svg)](https://codecov.io/gh/marksalvin/awaiting-async)
 
 ## About
 
-Promisync is an async await precursor for promise based flow control sanity.
+awaiting-async is an async await precursor for promise based flow control sanity.
 
 ## Build
 
@@ -42,4 +42,14 @@ or
 
 ```
 npm run build
+```
+
+## Usage
+
+```
+const aa = require('awaiting-async');
+
+aa(function * () {
+  yield Promise.resolve('Some val');
+});
 ```

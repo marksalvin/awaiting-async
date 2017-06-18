@@ -1,0 +1,12 @@
+.nyc_output
+.vscode
+coverage
+test
+.babelrc
+.editorconfig
+.eslintrc
+.gitignore
+.npmignore
+.travis.yml
+coverage.lcov
+rollup.config.js
