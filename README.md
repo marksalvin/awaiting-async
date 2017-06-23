@@ -1,5 +1,7 @@
 # awaiting-async · ![alt](https://travis-ci.org/marksalvin/awaiting-async.svg?branch=master "Build") [![codecov](https://codecov.io/gh/marksalvin/awaiting-async/branch/master/graph/badge.svg)](https://codecov.io/gh/marksalvin/awaiting-async)
 
+### Note - there appears to be an issue using bundle via npm, will release a fix soon
+
 ## About
 
 awaiting-async is an async await precursor for promise based flow control sanity.
