@@ -22,7 +22,8 @@ export default {
     {
       dest: pkg.main,
       format: 'umd',
-      moduleName: 'awaiting-async',
+      moduleId: "awaiting-async",
+      moduleName: "awaitingAsync",
       sourceMap: true
     },
     {
