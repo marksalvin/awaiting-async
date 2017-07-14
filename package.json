@@ -1,7 +1,7 @@
 {
   "name": "awaiting-async",
   "description": "An async await precursor for web browsers and Node.js",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "Mark Salvin <marksalvin@users.noreply.github.com>",
   "license": "MIT",
   "repository": "marksalvin/awaiting-async",
