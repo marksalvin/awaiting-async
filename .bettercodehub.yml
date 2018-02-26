@@ -1,4 +1,0 @@
-languages:
-  - javascript
-exclude:
-  - rollup.config.js
