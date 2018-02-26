@@ -1,4 +1,4 @@
-# awaiting-async · ![alt](https://travis-ci.org/marksalvin/awaiting-async.svg?branch=master "Build") [![codecov](https://codecov.io/gh/marksalvin/awaiting-async/branch/master/graph/badge.svg)](https://codecov.io/gh/marksalvin/awaiting-async)
+# awaiting-async · ![alt](https://travis-ci.org/marksalvin/awaiting-async.svg?branch=master "Build") [![codecov](https://codecov.io/gh/marksalvin/awaiting-async/branch/master/graph/badge.svg)](https://codecov.io/gh/marksalvin/awaiting-async) [![BCH compliance](https://bettercodehub.com/edge/badge/marksalvin/awaiting-async?branch=master)](https://bettercodehub.com/)
 
 ## About
 
