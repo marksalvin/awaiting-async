@@ -8,7 +8,7 @@ test('that function returns a promise', t => {
   const target = proxyquire('../lib/', {});
 
   const fakeGenerator = function *() {};
-  
+
   const actual = typeof (target(fakeGenerator).then);
   const expected = 'function';
 
@@ -18,7 +18,7 @@ test('that function returns a promise', t => {
 });
 
 test('that when generator has no yields it resolves with return value from generator', t => {
-  
+
   t.plan(1);
 
   const target = proxyquire('../lib/', {
@@ -28,12 +28,12 @@ test('that when generator has no yields it resolves with return value from gener
   const fakeGenerator = function *() {
     return 'fake return value';
   };
-  
+
   target(fakeGenerator)
     .then(result => {
       const actual = result;
       const expected = 'fake return value';
-      
+
       t.equals(actual, expected,
         'expected value returned');
     });
@@ -45,7 +45,7 @@ test('that when generator has a resolved yield it calls async runner with a reso
   t.plan(2);
 
   const target = proxyquire('../lib/', {
-    './runner': (thenable, resolve, reject, it) => {
+    './runner': ({ thenable, resolve, reject }, it) => {
       thenable
         .then(result => {
           t.equal(result, 'fake resolution reason');
@@ -55,17 +55,17 @@ test('that when generator has a resolved yield it calls async runner with a reso
   });
 
   const fakeGenerator = function *() {
-    const value = yield Promise.resolve('fake resolution reason');
+    yield Promise.resolve('fake resolution reason');
   };
 
   target(fakeGenerator)
     .then(result => {
       const actual = result;
       const expected = 'fake fulfilled value';
-      
+
       t.is(actual, expected,
         'expected value returned');
-      
+
     });
 
 });
@@ -75,8 +75,8 @@ test('that when generator has a rejected yield it calls async runner with a reje
   t.plan(2);
 
   const target = proxyquire('../lib/', {
-    './runner': (value, resolve, reject, it) => {
-      value
+    './runner': ({ thenable, resolve, reject }, it) => {
+      thenable
         .catch(error => {
           t.equals(error, 'fake rejection reason');
           return resolve('fake fulfilled value');
@@ -85,17 +85,17 @@ test('that when generator has a rejected yield it calls async runner with a reje
   });
 
   const fakeGenerator = function *() {
-    const value = yield Promise.reject('fake rejection reason');
+    yield Promise.reject('fake rejection reason');
   };
 
   target(fakeGenerator)
     .then(result => {
       const actual = result;
       const expected = 'fake fulfilled value';
-      
+
       t.equals(actual, expected,
         'expected value returned');
-      
+
     });
 
 });
@@ -105,7 +105,7 @@ test('that when generator throws an unhandled error that error is thrown out of 
   t.plan(1);
 
   const target = proxyquire('../lib/', {
-    './runner': (value, resolve, reject, it) => {
+    './runner': ({ thenable, resolve, reject }, it) => {
       t.fail('This should not be called');
     },
   });
@@ -121,10 +121,10 @@ test('that when generator throws an unhandled error that error is thrown out of 
     .catch(error => {
       const actual = error;
       const expected = new Error('fake error reason');
-      
+
       t.deepEquals(actual, expected,
         'expected value thrown out of function');
-      
+
     });
 
 });
