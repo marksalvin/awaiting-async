@@ -16,7 +16,7 @@ const plugins = [
   }),
 ];
 
-const external = [
+const targets = [
   {
     dest: pkg.main,
     format: 'umd',
